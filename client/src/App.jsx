@@ -1,6 +1,9 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import AuthPage from './pages/AuthPage';
+import Dashboard from './pages/Dashboard';
 import './App.css';
 
 function App() {
@@ -8,9 +11,17 @@ function App() {
     <AuthProvider>
       <Router>
         <div className="App">
-          <h1>LinguaLift</h1>
           <Routes>
-            <Route path="/" element={<div>Welcome to LinguaLift!</div>} />
+            <Route path="/auth" element={<AuthPage />} />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </div>
       </Router>
