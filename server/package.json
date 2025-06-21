@@ -1,5 +1,22 @@
 {
   "dependencies": {
-    "init": "^0.1.2"
+    "@prisma/client": "^6.10.1",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "init": "^0.1.2",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "db:migrate": "npx prisma migrate dev",
+    "db:generate": "npx prisma generate",
+    "db:studio": "npx prisma studio"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10",
+    "prisma": "^6.10.1"
   }
 }
