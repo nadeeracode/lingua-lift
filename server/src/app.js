@@ -19,9 +19,9 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 
 // Handle 404
-// app.use('*', (req, res) => {
-//   res.status(404).json({ message: 'Route not found' });
-// });
+app.all('/{*any}', (req, res) => {
+  res.status(404).json({ message: 'Route not found' });
+});
 
 // Global error handler
 app.use((err, req, res, next) => {
