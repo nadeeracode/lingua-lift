@@ -8,7 +8,7 @@ const register = async (req, res) => {
     const { email, password } = req.body;
 
     // Validation
-    if (!email || !password) {
+    if (!email || !password || !email.trim()) {
       return res.status(400).json({ message: 'Email and password are required' });
     }
 
@@ -53,9 +53,14 @@ const register = async (req, res) => {
       token,
       user,
     });
+ 
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ message: 'Failed to register user' });
+    if (error.code === "P2002") {
+      res.status(400).json({ message: 'A record with this data already exists' });
+    } else {
+      res.status(500).json({ message: 'Failed to register user' });
+    }
   }
 };
 
