@@ -32,7 +32,11 @@ const authenticate = async (req, res, next) => {
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({ message: 'Token expired' });
     }
-    
+    if (error.name === 'PrismaClientInitializationError') {
+      console.error('Get profile error:', error)
+      return res.status(500).json({ message: 'Failed to get user profile' });
+    }
+
     console.error('Authentication error:', error);
     res.status(500).json({ message: 'Authentication failed' });
   }
