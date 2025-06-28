@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AuthPage from './pages/AuthPage';
 import Dashboard from './pages/Dashboard';
+import DeckView from './pages/DeckView';
 import './App.css';
 
 function App() {
@@ -21,7 +22,17 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="/deck/:deckId"
+              element={
+                <ProtectedRoute>
+                  <DeckView />
+                </ProtectedRoute>
+              } 
+            />
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            {/* Catch all - redirect to dashboard */}
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+
           </Routes>
         </div>
       </Router>

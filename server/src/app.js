@@ -3,6 +3,8 @@ const cors = require('cors');
 require('dotenv').config();
 // Import routes
 const authRoutes = require('./routes/auth');
+const deckRoutes = require('./routes/decks');
+const cardRoutes = require('./routes/cards');
 
 const app = express();
 
@@ -17,6 +19,10 @@ app.get('/api/health', (req, res) => {
 
 // Auth routes
 app.use('/api/auth', authRoutes);
+
+// Decks & Cards
+app.use('/api/decks', deckRoutes);
+app.use('/api/decks', cardRoutes);
 
 // Handle 404
 app.all('/{*any}', (req, res) => {
