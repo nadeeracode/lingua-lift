@@ -1,34 +1,53 @@
+// Updated Dashboard.jsx with SRS Integration
+
 import React, { useState, useEffect } from 'react';
-import { Plus, BookOpen, User, LogOut } from 'lucide-react';
+import { Plus, BookOpen, User, LogOut, Calendar, Brain } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { deckService } from '../services/deckService';
+import { studyService } from '../services/studyService'; // Add this import
 import DeckCard from '../components/DeckCard';
 import DeckForm from '../components/DeckForm';
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [decks, setDecks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingDeck, setEditingDeck] = useState(null);
+  const [studyStats, setStudyStats] = useState(null); // Add this state
 
   useEffect(() => {
-    fetchDecks();
+    loadDashboardData();
   }, []);
 
-  const fetchDecks = async () => {
+  // Combined function to load both decks and study stats
+  const loadDashboardData = async () => {
     try {
       setLoading(true);
-      const data = await deckService.getDecks();
-      setDecks(data);
+      // Load decks and study stats in parallel
+      const [decksData, statsData] = await Promise.all([
+        deckService.getDecks(),
+        studyService.getStudyStats().catch(err => {
+          console.error('Error loading study stats:', err);
+          return null; // Return null if stats fail to load
+        })
+      ]);
+      setDecks(decksData);
+      setStudyStats(statsData);
       setError('');
-
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Update fetchDecks to also refresh study stats
+  const fetchDecks = async () => {
+    await loadDashboardData();
   };
 
   const handleCreateDeck = async (deckData) => {
@@ -37,6 +56,10 @@ const Dashboard = () => {
       setDecks([newDeck, ...decks]);
       setShowCreateForm(false);
       setError('');
+      
+      // Refresh study stats after creating a deck
+      const statsData = await studyService.getStudyStats().catch(() => null);
+      setStudyStats(statsData);
     } catch (err) {
       setError(err.message);
       throw err;
@@ -64,14 +87,24 @@ const Dashboard = () => {
       await deckService.deleteDeck(id);
       setDecks(decks.filter(deck => deck.id !== id));
       setError('');
+      
+      // Refresh study stats after deleting a deck
+      const statsData = await studyService.getStudyStats().catch(() => null);
+      setStudyStats(statsData);
     } catch (err) {
       setError(err.message);
     }
   };
 
   const handleStudy = (deck) => {
-    // TODO: Navigate to study mode
-    console.log('Starting study session for deck:', deck.id);
+    // Check if deck has cards
+    if (!deck._count?.cards || deck._count.cards === 0) {
+      alert('This deck has no cards to study. Please add some cards first.');
+      return;
+    }
+   
+    // Navigate to study mode
+    navigate(`/study/${deck.id}`);
   };
 
   const handleLogout = () => {
@@ -139,16 +172,56 @@ const Dashboard = () => {
           </div>
           <div className="stat-card">
             <div className="stat-content">
-              <div className="stat-icon-circle purple">
-                <span>🎯</span>
-              </div>
+              <Calendar className="stat-icon orange" />
               <div className="stat-info">
-                <h3>Study Streak</h3>
-                <p className="stat-value purple">0 days</p>
+                <h3>Due for Review</h3>
+                <p className="stat-value orange">
+                  {studyStats?.dueCards || 0}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-content">
+              <Brain className="stat-icon purple" />
+              <div className="stat-info">
+                <h3>Reviewed Today</h3>
+                <p className="stat-value purple">
+                  {studyStats?.reviewedToday || 0}
+                </p>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Study Summary Section - Add this new section */}
+        {studyStats && studyStats.dueCards > 0 && (
+          <div className="study-summary-section">
+            <div className="study-summary-card">
+              <div className="study-summary-content">
+                <div className="study-summary-icon">
+                  <Brain size={32} />
+                </div>
+                <div className="study-summary-text">
+                  <h3>Ready to Study!</h3>
+                  <p>You have {studyStats.dueCards} cards due for review across your decks.</p>
+                </div>
+                <button 
+                  onClick={() => {
+                    // Find the first deck with cards and navigate to study
+                    const deckWithCards = decks.find(deck => deck._count?.cards > 0);
+                    if (deckWithCards) {
+                      navigate(`/study/${deckWithCards.id}`);
+                    }
+                  }}
+                  className="study-now-btn"
+                >
+                  Study Now
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Deck Management Section */}
         <div className="deck-section">

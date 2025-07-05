@@ -5,6 +5,7 @@ require('dotenv').config();
 const authRoutes = require('./routes/auth');
 const deckRoutes = require('./routes/decks');
 const cardRoutes = require('./routes/cards');
+const studyRoutes = require('./routes/study')
 
 const app = express();
 
@@ -23,6 +24,9 @@ app.use('/api/auth', authRoutes);
 // Decks & Cards
 app.use('/api/decks', deckRoutes);
 app.use('/api/decks', cardRoutes);
+
+// Study
+app.use('/api/study', studyRoutes);
 
 // Handle 404
 app.all('/{*any}', (req, res) => {

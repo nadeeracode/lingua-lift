@@ -5,6 +5,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AuthPage from './pages/AuthPage';
 import Dashboard from './pages/Dashboard';
 import DeckView from './pages/DeckView';
+import StudyMode from './components/StudyMode';
+
 import './App.css';
 
 function App() {
@@ -26,6 +28,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <DeckView />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/study/:deckId" 
+              element={
+                <ProtectedRoute>
+                  <StudyMode />
                 </ProtectedRoute>
               } 
             />
