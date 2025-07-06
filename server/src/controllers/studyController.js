@@ -1,14 +1,12 @@
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../utils/db');
 const { SRSService } = require('../utils/srsService');
-
-const prisma = new PrismaClient();
 
 // Get cards for study session
 getStudyCards = async (req, res) => {
   try {
     const { deckId } = req.params;
     const userId = req.user.id;
-    
+
     // Get all cards in the deck with their study data
     const deck = await prisma.deck.findFirst({
       where: {

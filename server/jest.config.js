@@ -8,5 +8,7 @@ module.exports = {
     '!src/utils/db.js',
   ],
   setupFilesAfterEnv: ['<rootDir>/src/__tests__/setup.js'],
+  coverageDirectory: 'coverage',
+  coverageReporters: ['text', 'lcov', 'html'],
   testTimeout: 10000,
 };
